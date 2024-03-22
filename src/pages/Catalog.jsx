@@ -14,6 +14,9 @@ const Catalog = () => {
 
     const [DataProducts, setDataProducts] = useState([]);
     const [SliceDataProducts, setSliceDataProducts] = useState(6);
+    const [Hidden, setHidden] = useState(false);
+
+    const handleFilter = () => setHidden(prev => !prev)
 
     const handleLoad = () => {
         if (SliceDataProducts > (DataProducts.length - 1)) {
@@ -23,6 +26,10 @@ const Catalog = () => {
         }
     }
 
+    const handleProducts = () => {
+        setDataProducts(() => Data && Data?.length ? Data : []);
+    }
+
     const handleRoom = (e) => {
         const value = e.target.dataset.byRoom?.toLowerCase();
 
@@ -30,7 +37,48 @@ const Catalog = () => {
 
         setDataProducts([...data])
 
-        
+    }
+
+    const handleConcept = e => {
+        const value = e.target.dataset.byConcept?.toLowerCase();
+
+        const data = Data?.filter(product => (
+            product?.category?.quality?.toLowerCase() === value
+        ))
+
+        setDataProducts([...data])
+    }
+
+    const handleGender = e => {
+        const value = e.target.value.toLowerCase();
+
+        if (e.target.checked) {
+            const data = Data?.filter(product => (
+                product?.category?.gender?.toLowerCase() === value
+            ))
+
+            setDataProducts([...data])
+        } else {
+            setDataProducts([...Data])
+        }
+    }
+
+    const handlePrice = e => {
+        const priceMin = Number(e.target["data-price-min"]);
+        const priceMax = Number(e.target["data-price-max"]);
+
+        if (e?.target?.checked) {
+
+            const data = Data?.filter(product => (
+                product.price >= priceMin &&
+                product.price <= priceMax
+            ));
+
+            setDataProducts([...data]);
+
+        } else {
+            setDataProducts([...Data])
+        }
     }
 
     useEffect(() => {
@@ -50,6 +98,7 @@ const Catalog = () => {
                         title={product.title}
                         colors={product.colors}
                         price={product.price}
+                        savedproduct={product}
                     />
                 </Fragment>
             )
@@ -78,7 +127,7 @@ const Catalog = () => {
                 <Container>
                     <Flex justify={"space-between"} gap={130}>
                         {/*Products__aside show*/}
-                        <aside className={`Products__aside show`}>
+                        <aside className={`Products__aside ${Hidden && "show"}`}>
                             <div className="Products__aside-item">
                                 <Typography.Title level={4} className={`Products__aside-title`}>New
                                     arrivals</Typography.Title>
@@ -99,19 +148,19 @@ const Catalog = () => {
                                     </li>
 
                                     <li>
-                                        <Title bodyText={'p'} className={`Products__aside-text`}>living room</Title>
+                                        <Title data-by-room={"Living Room"} onClick={handleRoom} bodyText={'p'} className={`Products__aside-text`}>living room</Title>
                                     </li>
 
                                     <li>
-                                        <Title bodyText={'p'} className={`Products__aside-text`}>child room</Title>
+                                        <Title data-by-room={"Child Room"} onClick={handleRoom} bodyText={'p'} className={`Products__aside-text`}>child room</Title>
                                     </li>
 
                                     <li>
-                                        <Title bodyText={'p'} className={`Products__aside-text`}>bathroom</Title>
+                                        <Title data-by-room={"Bathroom"} onClick={handleRoom} bodyText={'p'} className={`Products__aside-text`}>bathroom</Title>
                                     </li>
 
                                     <li>
-                                        <Title bodyText={'p'} className={`Products__aside-text`}>Outdoor</Title>
+                                        <Title data-by-room={"Other"} onClick={handleRoom} bodyText={'p'} className={`Products__aside-text`}>Outdoor</Title>
                                     </li>
                                 </ul>
                             </div>
@@ -122,16 +171,16 @@ const Catalog = () => {
                                 <ul className={`list-none Products__aside-list`}>
 
                                     <li>
-                                        <Title bodyText={'p'} className={`Products__aside-text`}>Conscious</Title>
+                                        <Title onClick={handleConcept} data-by-concept={"Conscious"} bodyText={'p'} className={`Products__aside-text`}>Conscious</Title>
                                     </li>
 
                                     <li>
-                                        <Title bodyText={'p'} className={`Products__aside-text`}>premium
+                                        <Title onClick={handleConcept} data-by-concept={"premium quality"} bodyText={'p'} className={`Products__aside-text`}>premium
                                             quality</Title>
                                     </li>
 
                                     <li>
-                                        <Title bodyText={'p'} className={`Products__aside-text`}>classic
+                                        <Title onClick={handleConcept} data-by-concept={"classic collection"} bodyText={'p'} className={`Products__aside-text`}>classic
                                             collection</Title>
                                     </li>
                                 </ul>
@@ -140,19 +189,22 @@ const Catalog = () => {
                             <div className="Products__aside-item">
                                 <Typography.Title className="Products__aside-title"
                                     level={4}>gender</Typography.Title>
-                                <ul className={`list-none Products__aside-list`}>
 
-                                    <li>
-                                        <Checkbox value={"Man"}>
-                                            <Title bodyText={'p'} className={`Products__aside-text`}>Man</Title>
-                                        </Checkbox>
-                                    </li>
-                                    <li>
-                                        <Checkbox value={"Woman"}>
-                                            <Title bodyText={'p'} className={`Products__aside-text`}>woman</Title>
-                                        </Checkbox>
-                                    </li>
-                                </ul>
+                                <Checkbox.Group>
+                                    <ul className={`list-none Products__aside-list`}>
+
+                                        <li>
+                                            <Checkbox value={"Man"} onChange={handleGender}>
+                                                <Title bodyText={'p'} className={`Products__aside-text`}>Man</Title>
+                                            </Checkbox>
+                                        </li>
+                                        <li>
+                                            <Checkbox value={"Woman"} onChange={handleGender}>
+                                                <Title bodyText={'p'} className={`Products__aside-text`}>woman</Title>
+                                            </Checkbox>
+                                        </li>
+                                    </ul>
+                                </Checkbox.Group>
                             </div>
 
                             <div className="Products__aside-item">
@@ -189,7 +241,7 @@ const Catalog = () => {
                                     <ul className={`list-none Products__aside-list`}>
 
                                         <li>
-                                            <Checkbox data-price-min={0} data-price-max={40} value={"40"}>
+                                            <Checkbox onChange={handlePrice} data-price-min={0} data-price-max={40} value={"40"}>
                                                 <Title bodyText={'p'}
                                                     className={`Products__aside-text`}>0$-40$</Title>
                                             </Checkbox>
@@ -230,12 +282,12 @@ const Catalog = () => {
                         </aside>
 
                         {/*Products__wrap active*/}
-                        <article className="Products__wrap active">
+                        <article className={`Products__wrap ${Hidden && "active"}`}>
                             <Title level={"h1"} className={`Products__title`}>BEDROOM</Title>
                             <Title level={"h3"} className={`Products__subtitle`}>ITS EASY TO TRANSFORM YOUR BEDROOM INTERIOR WITH OUR GREAT SELECTION OF ACCESSORIES.</Title>
 
                             <Flex align={"center"} justify={"space-between"} className="Products__filters">
-                                <Button icon={<FiFilter />}>
+                                <Button icon={<FiFilter />} onClick={handleFilter}>
                                     filter & sort
                                 </Button>
 
@@ -243,7 +295,7 @@ const Catalog = () => {
                                     <Btn className={`Products__filters-red`} secondary>
                                         <Title bodyText={"p"}>Models</Title>
                                     </Btn>
-                                    <Btn secondary>
+                                    <Btn secondary onClick={handleProducts}>
                                         <Title bodyText={"p"}>products</Title>
                                     </Btn>
 

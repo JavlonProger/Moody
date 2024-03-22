@@ -1,102 +1,146 @@
-import {Fragment} from "react";
+import { Fragment, useState, useEffect, useContext } from "react";
 import Breadcrumb from "../components/Breadcrumb";
 import Container from "../components/container";
-import {Col, Flex, Image, Row, Select, Typography} from "antd";
+import { Col, Flex, Image, Row, Select, Typography } from "antd";
 import Img from "../components/image";
 import Product3_1 from "../images/product3-0.png";
 import Product3_2 from "../images/product3-1.png";
 import Product3_3 from "../images/product3-2.png";
 import Title from "../components/Title";
-import {FaLocationDot} from "react-icons/fa6";
+import { FaLocationDot } from "react-icons/fa6";
 import AlsoBuy from "../components/Also-buy";
-import {default as Btn} from "../components/Button";
+import { default as Btn } from "../components/Button";
+import { Context } from "./../Context"
+import { useCart } from "react-use-cart";
+import { useParams } from "react-router-dom";
 
 const Product = () => {
-  return(
-      <Fragment>
-          <Breadcrumb current={"Checked Duvet Cover Set"} />
+    const { id } = useParams();
 
-          <section className="Product">
-              <Container>
-                  <Row className={`Product__row`}>
-                      <Col span={16} className="Product__data">
-                          <Row justify={"space-between"} className={`Product__data-images`}>
-                              <Col span={11}>
-                                  <Img className={`Product__imageholder`} src={Product3_1} alt={`Checked Duvet Cover Set`} />
-                              </Col>
+    const { Data } = useContext(Context);
 
-                              <Col span={11}>
-                                  <Img className={`Product__imageholder`} src={Product3_2} alt={`Checked Duvet Cover Set`} />
-                              </Col>
+    const { addItem } = useCart();
 
-                              <Col span={24}>
-                                  <Img className={`Product__imageholder`} src={Product3_3} alt={`Checked Duvet Cover Set`} />
-                              </Col>
-                          </Row>
+    const [DataItem, setDataItem] = useState({});
 
-                          <Row>
-                              <Col span={24} className={`Product__data-desc`}>
-                                  <Title bodyText={"p"} className={`Product__data-desc__title`}>
-                                      Conscious
-                                  </Title>
+    const [DataItemSize, setDataItemSize] = useState("");
 
-                                  <Title level={"h3"} className={`Product__data-desc__text`}>
-                                      Twin duvet cover set in soft, woven fabric made from a Tencel™lyocell and cotton blend with a printed pattern. One pillowcase. Thread count 144.
-                                  </Title>
+    const [DefaultSelectValue,
+        setDefaultSelectValue] = useState(`SELECT SIZE`);
 
-                                  <ul className={'list-none Product__data-desc__list '}>
-                                      <li className={`Product__data-desc__item`}>
-                                          <Flex>
-                                              Composition — <Title level={"h3"}> Cotton 50%, Lyocell 50%</Title>
-                                          </Flex>
-                                      </li>
+    const Product = { ...DataItem, size: DataItemSize };
 
-                                      <li className={`Product__data-desc__item`}>
-                                          <Flex>
-                                              Art. No. — <Title level={"h3"}> 0643448004</Title>
-                                          </Flex>
-                                      </li>
-                                  </ul>
+    const handleSize = value => setDataItemSize(value);
 
-                              </Col>
-                          </Row>
-                      </Col>
+    const handleProduct = () => {
+        addItem(Product);
+        setDefaultSelectValue(`SELECT SIZE`);
+        setTimeout(() => {
+            window.location.replace("/bag/");
+        }, 2000);
+    }
 
-                      <Col span={7} className="Product__content">
-                          <Title level={"h2"}>Checked Duvet Cover Set</Title>
+    useEffect(() => {
 
-                          <Typography.Title level={3}>39.99 $</Typography.Title>
+        for (const product of Data) {
+            if (product.id == id) {
+                setDataItem(product);
+                break;
+            }
+        }
 
-                          <Typography.Title level={3} className={`Product__content-desc`}>
-                              Light khaki green/white checks
-                          </Typography.Title>
+    }, [Data.length, id, DataItem.id]);
 
-                          <Image src={Product3_1} height={72} alt={`Checked Duvet Cover Set`} className={`Product__content-image`} />
+    // console.log(DataItem);
 
-                          <Title level={"h3"} className={`Product__content-location`}> <FaLocationDot /> Not available in stores</Title>
+    return (
+        <Fragment>
+            <Breadcrumb current={"Checked Duvet Cover Set"} />
 
-                          <Select
-                              options={[
-                                  {value: "50 X 40", label: "50 X 40"},
-                                  {value: "70 X 40", label: "70 X 40"},
-                              ]}
+            <section className="Product">
+                <Container>
+                    <Row className={`Product__row`}>
+                        <Col span={16} className="Product__data">
+                            <Row justify={"space-between"} className={`Product__data-images`}>
+                                <Col span={11}>
+                                    <Img className={`Product__imageholder`} src={DataItem.image} alt={`Checked Duvet Cover Set`} />
+                                </Col>
 
-                              defaultValue={`select size`}
-                              className={`Product__content-select`}
-                          />
+                                <Col span={11}>
+                                    <Img className={`Product__imageholder`} src={Product3_2} alt={`Checked Duvet Cover Set`} />
+                                </Col>
 
-                          <div className="Product__content-buttons">
-                              <Btn primary>Add to shopping bag</Btn>
-                          </div>
+                                <Col span={24}>
+                                    <Img className={`Product__imageholder`} src={Product3_3} alt={`Checked Duvet Cover Set`} />
+                                </Col>
+                            </Row>
 
-                      </Col>
-                  </Row>
-              </Container>
-          </section>
+                            <Row>
+                                <Col span={24} className={`Product__data-desc`}>
+                                    <Title bodyText={"p"} className={`Product__data-desc__title`}>
+                                        Conscious
+                                    </Title>
 
-          <AlsoBuy />
-      </Fragment>
-  )
+                                    <Title level={"h3"} className={`Product__data-desc__text`}>
+                                        Twin duvet cover set in soft, woven fabric made from a Tencel™lyocell and cotton blend with a printed pattern. One pillowcase. Thread count 144.
+                                    </Title>
+
+                                    <ul className={'list-none Product__data-desc__list '}>
+                                        <li className={`Product__data-desc__item`}>
+                                            <Flex>
+                                                Composition — <Title level={"h3"}> Cotton 50%, Lyocell 50%</Title>
+                                            </Flex>
+                                        </li>
+
+                                        <li className={`Product__data-desc__item`}>
+                                            <Flex>
+                                                Art. No. — <Title level={"h3"}> 0643448004</Title>
+                                            </Flex>
+                                        </li>
+                                    </ul>
+
+                                </Col>
+                            </Row>
+                        </Col>
+
+                        <Col span={7} className="Product__content">
+                            <Title level={"h2"}> {DataItem.title} </Title>
+
+                            <Typography.Title level={3}>{DataItem.price} $</Typography.Title>
+
+                            <Typography.Title level={3} className={`Product__content-desc`}>
+                                {DataItem.description}
+                            </Typography.Title>
+
+                            <Image src={DataItem.image} height={72} alt={`Checked Duvet Cover Set`} className={`Product__content-image`} />
+
+                            <Title level={"h3"} className={`Product__content-location`}> <FaLocationDot /> Not available in stores</Title>
+
+                            <Select
+                                options={DataItem.sizes}
+                                onChange={handleSize}
+                                defaultValue={DefaultSelectValue}
+                                className={`Product__content-select`}
+                            />
+
+                            <div className="Product__content-buttons">
+                                <Btn
+                                    primary
+                                    onClick={handleProduct}
+                                    disabled={DataItemSize === ""}
+                                >
+                                    Add to shopping bag
+                                </Btn>
+                            </div>
+
+                        </Col>
+                    </Row>
+                </Container>
+            </section>
+
+            <AlsoBuy />
+        </Fragment>
+    )
 }
 
 export default Product;
